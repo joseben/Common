@@ -1,8 +1,13 @@
 #include<LiquidCrystal.h>
-LiquidCrystal lcd(13,12,11,10,9,8);
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
 
-#define in 14 // Analog pin A0 has a IR Module attached to it.
-#define out 15 // Analog pin A1 has a IR Module attached to it.
+#define button_IN 8
+#define button_OUT 7
+#define RED 10
+#define GREEN 9
+
+
+int flag=0;
 
 int count=0;
 
@@ -13,7 +18,8 @@ void IN()
     lcd.print("Person In Room:");
     lcd.setCursor(0,1);
     lcd.print(count);
-    delay(1000);
+    delay(250);
+   
 }
 
 void OUT()
@@ -23,16 +29,23 @@ void OUT()
     lcd.print("Person In Room:");
     lcd.setCursor(0,1); // set the cursor positon
     lcd.print(count); // Display count value
-    delay(1000);
+    delay(250);
+    
 }
 
 void setup()
-{
+{  
   lcd.begin(16,2);
+
   lcd.print("Visitor Counter");
   delay(2000);
-  pinMode(in, INPUT); // Assign the IR is Input
-  pinMode(out, INPUT);//Assign the IR is Input
+  pinMode(button_IN, INPUT); // Assign the Button
+  pinMode(button_OUT, INPUT);//Assign the Button
+  pinMode(RED, OUTPUT);//Assign the LED
+  pinMode(GREEN, OUTPUT);//Assign the LED
+  digitalWrite(GREEN,LOW);
+  digitalWrite(RED,LOW);
+
   lcd.clear();
   lcd.print("Person In Room:");
   lcd.setCursor(0,1);
@@ -42,23 +55,50 @@ void setup()
 void loop()
 {  
   
-  if(digitalRead(in))
-  IN();
-  if(digitalRead(out))
-  OUT();
-  
- /* if(count<=0)
+  if(digitalRead(button_IN)==HIGH && flag==0)
   {
-    lcd.clear();
-    digitalWrite(relay, LOW); // relay is in ON conditon
-    lcd.clear();
-    lcd.print("Nobody In Room");
-    lcd.setCursor(0,1);
-    lcd.print("Light Is Off");
-    delay(200);
+     flag=1;
+    }
+
+  else if(digitalRead(button_IN)==HIGH && flag==1)
+  {
+    IN();
+    flag=0;
+    }
+    
+  if(digitalRead(button_OUT)==HIGH && flag==1 )
+      { 
+        flag=0;
+        IN();
+      }
+    
+  else if(digitalRead(button_OUT)==HIGH && flag==0)
+  { 
+    OUT();
+    
+    }
+
+
+
+
+   
+  
+  if(count>5&&count<=10)
+  {
+    digitalWrite(GREEN,HIGH);
+    digitalWrite(RED,LOW);
+
   }
   
+  if (count>10)
+    {
+      digitalWrite(GREEN,LOW);
+      digitalWrite(RED, HIGH);
+      
+    }
   else
-    digitalWrite(relay, HIGH); // relay is OFF condition
-  */
+  {
+     digitalWrite(GREEN,LOW);
+     digitalWrite(RED,LOW);
+    }
 }
